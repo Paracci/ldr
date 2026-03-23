@@ -1,0 +1,111 @@
+name: LDR CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Check required files exist
+        run: |
+          files=(
+            "README.md"
+            "STANDARD.md"
+            "USE_CASES.md"
+            "CONTRIBUTING.md"
+            "SECURITY.md"
+            "CODE_OF_CONDUCT.md"
+            "CHANGELOG.md"
+            "LICENSE"
+          )
+          missing=0
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              missing=1
+            else
+              echo "OK: $f"
+            fi
+          done
+          exit $missing
+
+      - name: Lint markdown
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: '**/*.md'
+          config: '.markdownlint.json'
+        continue-on-error: true
+
+  validate-standard:
+    name: Validate Standard Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate registry seed data
+        run: |
+          node -e "
+            const fs = require('fs');
+            const seed = JSON.parse(fs.readFileSync('src/registry/seed.json', 'utf8'));
+            let errors = 0;
+            seed.forEach(entry => {
+              if (!entry.brand_id)        { console.error('Missing brand_id:', entry); errors++; }
+              if (!entry.brand_name)      { console.error('Missing brand_name:', entry.brand_id); errors++; }
+              if (!entry.phash)           { console.error('Missing phash:', entry.brand_id); errors++; }
+              if (!entry.targets)         { console.error('Missing targets:', entry.brand_id); errors++; }
+              if (!entry.targets.web_url) { console.error('Missing web_url:', entry.brand_id); errors++; }
+            });
+            if (errors > 0) { console.error(errors + ' schema error(s) found'); process.exit(1); }
+            else { console.log('Seed schema valid — ' + seed.length + ' entries'); }
+          "
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Run core hasher tests
+        run: node tests/core.test.js
+
+      - name: Run registry tests
+        run: node tests/registry.test.js
+
+      - name: Run SDK tests
+        run: node tests/sdk.test.js
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Verify no private keys in repo
+        run: |
+          if grep -r "PRIVATE KEY\|BEGIN RSA\|BEGIN EC" --include="*.js" --include="*.json" --include="*.md" .; then
+            echo "WARNING: Possible private key found in repository"
+            exit 1
+          else
+            echo "OK: No private keys detected"
+          fi

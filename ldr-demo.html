@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LDR — Logo Dynamic Redirect · Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080810;
+      --bg1: #0e0e1a;
+      --bg2: #141426;
+      --bg3: #1a1a32;
+      --line: rgba(255, 255, 255, 0.06);
+      --line2: rgba(255, 255, 255, 0.12);
+      --txt: #d8d8f0;
+      --txt2: #7070a0;
+      --txt3: #404060;
+      --accent: #6c63ff;
+      --accent2: #38d9c0;
+      --green: #3ddc84;
+      --yellow: #ffd166;
+      --red: #ff6b6b;
+      --mono: 'JetBrains Mono', monospace;
+      --display: 'Syne', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: var(--mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--line2);
+      background: rgba(8, 8, 16, 0.8);
+      backdrop-filter: blur(12px);
+    }
+
+    .ldr-mark {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ldr-sub {
+      font-size: 11px;
+      color: var(--txt2);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .version-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 4px 10px;
+      border: 1px solid var(--line2);
+      border-radius: 4px;
+      color: var(--txt2);
+      letter-spacing: 2px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 20px;
+    }
+
+    /* ── PANELS ── */
+    .panel {
+      background: var(--bg1);
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--txt2);
+      text-transform: uppercase;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    /* ── LOGO UPLOAD ── */
+    .upload-zone {
+      border: 1px dashed var(--line2);
+      border-radius: 10px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.05);
+    }
+
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .upload-hint {
+      font-size: 12px;
+      color: var(--txt2);
+      line-height: 1.6;
+    }
+
+    .upload-hint b {
+      color: var(--accent);
+    }
+
+    .logo-preview {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-preview img {
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: 8px;
+      border: 1px solid var(--line2);
+      background: #fff;
+      padding: 8px;
+      object-fit: contain;
+    }
+
+    .hash-display {
+      font-size: 11px;
+      padding: 8px 12px;
+      background: var(--bg2);
+      border-radius: 6px;
+      color: var(--accent2);
+      letter-spacing: 1px;
+      word-break: break-all;
+      text-align: center;
+      width: 100%;
+    }
+
+    .change-btn {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 5px 12px;
+      background: none;
+      border: 1px solid var(--line2);
+      border-radius: 4px;
+      color: var(--txt2);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+
+    .change-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── PRESET LOGOS ── */
+    .preset-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .preset-label {
+      font-size: 10px;
+      color: var(--txt3);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .preset-btn {
+      aspect-ratio: 1;
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+      font-family: var(--mono);
+      position: relative;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--line2);
+      transform: translateY(-1px);
+    }
+
+    .preset-btn.active {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+
+    .preset-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: var(--display);
+    }
+
+    .preset-name {
+      font-size: 9px;
+      color: var(--txt2);
+      letter-spacing: 1px;
+    }
+
+    .verified-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    /* ── CONTEXT ── */
+    .ctx-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    .ctx-row:last-child {
+      border-bottom: none;
+    }
+
+    .ctx-key {
+      color: var(--txt2);
+    }
+
+    .ctx-val {
+      display: flex;
+      gap: 4px;
+    }
+
+    .chip {
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.5px;
+      color: var(--txt2);
+      background: var(--bg2);
+    }
+
+    .chip:hover {
+      border-color: var(--line2);
+    }
+
+    .chip.on {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+
+    .chip.warn-on {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: rgba(255, 209, 102, 0.08);
+    }
+
+    .time-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex: 1;
+      margin-left: 20px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .time-val {
+      font-size: 11px;
+      color: var(--accent2);
+    }
+
+    /* ── SCAN BUTTON ── */
+    .scan-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), #4a43cc);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .scan-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .scan-btn:active {
+      transform: translateY(0);
+    }
+
+    .scan-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── LOG PANEL ── */
+    .log-panel {
+      min-height: 500px;
+      max-height: 680px;
+      grid-column: 2;
+      grid-row: 2;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .log-body {
+      overflow-y: auto;
+      flex: 1;
+      padding: 0;
+      font-size: 12px;
+
+    }
+
+    .log-empty {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--txt3);
+    }
+
+    .log-empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .log-empty-hint {
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    .log-lines {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .log-line {
+      display: grid;
+      grid-template-columns: 60px 64px 1fr;
+      gap: 12px;
+      align-items: baseline;
+      padding: 5px 8px;
+      border-radius: 4px;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.25s, transform 0.25s;
+      font-size: 11px;
+    }
+
+    .log-line.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .log-line:hover {
+      background: var(--bg2);
+    }
+
+    .log-ts {
+      color: var(--txt3);
+      font-size: 10px;
+    }
+
+    .log-tag {
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .tag-info {
+      background: rgba(108, 99, 255, 0.2);
+      color: #a09aff;
+    }
+
+    .tag-check {
+      background: rgba(56, 217, 192, 0.15);
+      color: var(--accent2);
+    }
+
+    .tag-ok {
+      background: rgba(61, 220, 132, 0.15);
+      color: var(--green);
+    }
+
+    .tag-warn {
+      background: rgba(255, 209, 102, 0.15);
+      color: var(--yellow);
+    }
+
+    .tag-route {
+      background: rgba(108, 99, 255, 0.3);
+      color: #c0b8ff;
+    }
+
+    .tag-err {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--red);
+    }
+
+    .log-msg {
+      color: var(--txt);
+      line-height: 1.5;
+    }
+
+    .log-msg .hi {
+      color: var(--accent2);
+    }
+
+    .log-msg .ok {
+      color: var(--green);
+    }
+
+    .log-msg .warn {
+      color: var(--yellow);
+    }
+
+    .log-msg .dim {
+      color: var(--txt2);
+    }
+
+    /* ── RESULT CARD ── */
+    .result-card {
+      margin: 0 16px 16px;
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid;
+    }
+
+    .result-card.ok {
+      background: rgba(61, 220, 132, 0.05);
+      border-color: rgba(61, 220, 132, 0.2);
+    }
+
+    .result-card.warn {
+      background: rgba(255, 209, 102, 0.05);
+      border-color: rgba(255, 209, 102, 0.2);
+    }
+
+    .result-card.err {
+      background: rgba(255, 107, 107, 0.05);
+      border-color: rgba(255, 107, 107, 0.2);
+    }
+
+    .result-icon {
+      font-size: 24px;
+    }
+
+    .result-meta {
+      flex: 1;
+    }
+
+    .result-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--txt2);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .result-url {
+      font-size: 13px;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .result-url.ok {
+      color: var(--green);
+    }
+
+    .result-url.warn {
+      color: var(--yellow);
+    }
+
+    .result-url.err {
+      color: var(--red);
+    }
+
+    .result-reason {
+      font-size: 10px;
+      color: var(--txt2);
+      margin-top: 4px;
+    }
+
+    .open-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid rgba(61, 220, 132, 0.3);
+      background: rgba(61, 220, 132, 0.08);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .open-btn:hover {
+      background: rgba(61, 220, 132, 0.15);
+    }
+
+    /* ── HASH COMPARE PANEL ── */
+    .compare-panel {
+      grid-column: 1 / -1;
+    }
+
+    .hash-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hash-row {
+      display: grid;
+      grid-template-columns: 70px 1fr 50px;
+      gap: 8px;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .hash-brand {
+      color: var(--txt2);
+    }
+
+    .hash-val {
+      font-size: 10px;
+      color: var(--txt3);
+      background: var(--bg2);
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      font-family: var(--mono);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hash-val.match {
+      color: var(--green);
+      background: rgba(61, 220, 132, 0.08);
+      border: 1px solid rgba(61, 220, 132, 0.2);
+    }
+
+    .hash-val.close {
+      color: var(--yellow);
+      background: rgba(255, 209, 102, 0.08);
+    }
+
+    .hash-dist {
+      font-size: 10px;
+      text-align: right;
+      color: var(--txt3);
+    }
+
+    .hash-dist.match {
+      color: var(--green);
+    }
+
+    .hash-dist.close {
+      color: var(--yellow);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 16px 0;
+    }
+
+    /* ── SCANNING ANIMATION ── */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.4
+      }
+    }
+
+    .spinning {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    .pulsing {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg3);
+      border-radius: 4px;
+    }
+
+    /* ── INTRO TEXT ── */
+    .intro {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      padding: 0 0 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .intro h1 {
+      font-family: var(--display);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .intro h1 span {
+      color: var(--accent);
+    }
+
+    .intro p {
+      font-size: 12px;
+      color: var(--txt2);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="ldr-mark">LDR</div>
+    <div>
+      <div class="ldr-sub">Logo Dynamic Redirect</div>
+    </div>
+    <div class="version-badge">v0.1.0-DEMO</div>
+  </header>
+
+  <div class="app">
+
+    <div class="intro">
+      <div>
+        <h1>LDR <span>DEMO</span></h1>
+        <p style="max-width:600px;margin-top:6px;">
+          Upload a logo or select a preset → real pHash is computed → looked up in registry → routed by context.
+          <span style="color:var(--txt3)">All computations run in the browser. Server is simulated.</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- LEFT COL -->
+    <div style="display:flex;flex-direction:column;gap:20px;grid-column:1;grid-row:2;">
+
+      <!-- Logo Panel -->
+      <div class="panel">
+        <div class="panel-head">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:block"></span>
+          <span class="panel-label">Logo Source</span>
+        </div>
+        <div class="panel-body">
+
+          <!-- Upload zone -->
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" accept="image/*">
+            <div id="upload-prompt">
+              <div class="upload-icon">⬆</div>
+              <div class="upload-hint">
+                Upload your own logo<br>
+                <b>PNG, SVG, JPG</b> supported
+              </div>
+            </div>
+            <div class="logo-preview" id="logo-preview">
+              <img id="preview-img" src="" alt="logo">
+              <div class="hash-display" id="hash-display">Computing pHash...</div>
+              <button class="change-btn" onclick="resetUpload()">↩ Change</button>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="preset-label">— or select a preset —</div>
+          <div class="preset-row" id="preset-row">
+            <button class="preset-btn" onclick="selectPreset('walmart')" id="preset-walmart">
+              <div class="verified-dot"></div>
+              <div class="preset-icon" style="background:rgba(0,113,206,0.15);color:#4fa3f7">W</div>
+              <div class="preset-name">Walmart</div>
+            </button>
+            <button class="preset-btn" onclick="selectPreset('mcdonalds')" id="preset-mcdonalds">
+              <div class="verified-dot"></div>
+              <div class="preset-icon" style="background:rgba(255,188,0,0.15);color:#ffd166">M</div>
+              <div class="preset-name">McDonald's</div>
+            </button>
+            <button class="preset-btn" onclick="selectPreset('netflix')" id="preset-netflix">
+              <div class="verified-dot"></div>
+              <div class="preset-icon" style="background:rgba(229,9,20,0.15);color:#ff6b6b">N</div>
+              <div class="preset-name">Netflix</div>
+            </button>
+            <button class="preset-btn" onclick="selectPreset('unknown')" id="preset-unknown">
+              <div class="preset-icon" style="background:rgba(255,107,107,0.1);color:#ff6b6b">?</div>
+              <div class="preset-name">Fake</div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Context Panel -->
+      <div class="panel">
+        <div class="panel-head">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--accent2);display:block"></span>
+          <span class="panel-label">User Context</span>
+        </div>
+        <div class="panel-body">
+
+          <div class="ctx-row">
+            <span class="ctx-key">time</span>
+            <div class="time-wrap">
+              <input type="range" min="0" max="23" value="14"
+                oninput="ctx.hour=+this.value;document.getElementById('time-lbl').textContent=pad(this.value)+':00'">
+              <span class="time-val" id="time-lbl">14:00</span>
+            </div>
+          </div>
+
+          <div class="ctx-row">
+            <span class="ctx-key">location</span>
+            <div class="ctx-val">
+              <span class="chip on" id="chip-store" onclick="setCtx('location','store')">🏪 In-store</span>
+              <span class="chip" id="chip-home" onclick="setCtx('location','home')">🏠 Home</span>
+            </div>
+          </div>
+
+          <div class="ctx-row">
+            <span class="ctx-key">language</span>
+            <div class="ctx-val">
+              <span class="chip on" id="chip-tr" onclick="setCtx('lang','tr')">TR</span>
+              <span class="chip" id="chip-en" onclick="setCtx('lang','en')">EN</span>
+            </div>
+          </div>
+
+          <div class="ctx-row">
+            <span class="ctx-key">app</span>
+            <div class="ctx-val">
+              <span class="chip on" id="chip-app-no" onclick="setCtx('app',false)">Not installed</span>
+              <span class="chip" id="chip-app-yes" onclick="setCtx('app',true)">Installed ✓</span>
+            </div>
+          </div>
+
+          <div class="ctx-row">
+            <span class="ctx-key">VPN</span>
+            <div class="ctx-val">
+              <span class="chip on" id="chip-vpn-no" onclick="setCtx('vpn',false)">Off</span>
+              <span class="chip warn-on" id="chip-vpn-yes" style="border-color:var(--line);color:var(--txt2);"
+                onclick="setCtx('vpn',true)">On ⚠</span>
+            </div>
+          </div>
+
+          <button class="scan-btn" id="scan-btn" onclick="runScan()">
+            <span id="scan-label">◉ SCAN</span>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LOG PANEL -->
+    <div class="panel log-panel" id="log-panel">
+      <div class="panel-head">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:block" id="log-dot"></span>
+        <span class="panel-label">Decision Log</span>
+        <span id="log-brand" style="margin-left:8px;font-size:10px;color:var(--accent);letter-spacing:1px;"></span>
+        <span id="log-time" style="margin-left:auto;font-size:10px;color:var(--txt3);"></span>
+      </div>
+      <div class="log-body" id="log-body">
+        <div class="log-empty" id="log-empty">
+          <div class="log-empty-icon">◉</div>
+          <div class="log-empty-hint">
+            Select a logo + configure context<br>
+            Press the SCAN button<br>
+            <span style="color:var(--txt3)">Watch every LDR decision step by step</span>
+          </div>
+        </div>
+        <div id="log-lines" class="log-lines" style="display:none;"></div>
+      </div>
+      <div id="result-card-wrap"></div>
+    </div>
+
+    <!-- HASH COMPARE PANEL -->
+    <div class="panel compare-panel" id="compare-panel" style="display:none;">
+      <div class="panel-head">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--yellow);display:block"></span>
+        <span class="panel-label">Hash Comparison</span>
+      </div>
+      <div class="panel-body">
+        <div class="hash-grid" id="hash-grid"></div>
+        <div class="divider"></div>
+        <div style="font-size:10px;color:var(--txt3);line-height:1.8;">
+          Hamming distance 0 = identical &nbsp;|&nbsp; ≤10 = match &nbsp;|&nbsp; ≤20 = suspicious &nbsp;|&nbsp; >20 =
+          different
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hidden canvas for image hashing -->
+  <canvas id="hash-canvas" style="display:none;"></canvas>
+
+  <script>
+    // ─── Perceptual Hasher (from src/core/hasher.js) ───────────────────────────
+
+    const Hasher = {
+      toGray(px) {
+        const n = px.length / 4, g = new Float32Array(n);
+        for (let i = 0; i < n; i++) g[i] = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+        return g;
+      },
+      resize(src, sw, sh, dw, dh) {
+        const dst = new Float32Array(dw * dh), xr = sw / dw, yr = sh / dh;
+        for (let y = 0; y < dh; y++) for (let x = 0; x < dw; x++) {
+          const sx = x * xr, sy = y * yr, x0 = Math.floor(sx), y0 = Math.floor(sy);
+          const x1 = Math.min(x0 + 1, sw - 1), y1 = Math.min(y0 + 1, sh - 1), xf = sx - x0, yf = sy - y0;
+          dst[y * dw + x] = src[y0 * sw + x0] * (1 - xf) * (1 - yf) + src[y0 * sw + x1] * xf * (1 - yf) + src[y1 * sw + x0] * (1 - xf) * yf + src[y1 * sw + x1] * xf * yf;
+        }
+        return dst;
+      },
+      dct2d(px, N) {
+        const cos = new Float32Array(N * N);
+        for (let k = 0; k < N; k++) for (let n = 0; n < N; n++) cos[k * N + n] = Math.cos((Math.PI / N) * (n + 0.5) * k);
+        const out = new Float32Array(N * N);
+        for (let ky = 0; ky < N; ky++) for (let kx = 0; kx < N; kx++) {
+          let s = 0;
+          for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) s += px[y * N + x] * cos[ky * N + y] * cos[kx * N + x];
+          out[ky * N + kx] = s * (kx === 0 ? Math.sqrt(1 / N) : Math.sqrt(2 / N)) * (ky === 0 ? Math.sqrt(1 / N) : Math.sqrt(2 / N));
+        }
+        return out;
+      },
+      compute(px, w, h) {
+        const g = this.toGray(px), s = this.resize(g, w, h, 32, 32), d = this.dct2d(s, 32);
+        const lf = new Float32Array(64);
+        for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) lf[y * 8 + x] = d[y * 32 + x];
+        const sorted = Float32Array.from(lf).sort();
+        const med = (sorted[31] + sorted[32]) / 2;
+        let hash = 0n;
+        for (let i = 0; i < 64; i++) if (lf[i] > med) hash |= (1n << BigInt(63 - i));
+        return hash.toString(16).padStart(16, '0');
+      },
+      hamming(a, b) {
+        let x = BigInt('0x' + a) ^ BigInt('0x' + b), c = 0;
+        while (x > 0n) { c += Number(x & 1n); x >>= 1n; }
+        return c;
+      }
+    };
+
+    // ─── Registry simulation ───────────────────────────────────────────────────
+
+    const REGISTRY = {
+      'walmart-global': {
+        brand_name: 'Walmart', verified: true, emoji: '🛒',
+        phash: null, // computed from preset canvas
+        targets: { app_scheme: 'walmart://home', web_url: 'https://walmart.com', fallback_url: 'https://walmart.com/app' },
+        rules: [
+          { id: 'in-store-morning', cond: c => c.location === 'store' && c.hour >= 6 && c.hour < 12, app: 'walmart://morning', web: 'https://walmart.com/morning-deals' },
+          { id: 'in-store-afternoon', cond: c => c.location === 'store' && c.hour >= 12 && c.hour < 20, app: 'walmart://deals', web: 'https://walmart.com/deals' },
+          { id: 'in-store-evening', cond: c => c.location === 'store' && c.hour >= 20, app: 'walmart://evening', web: 'https://walmart.com/evening-deals' },
+          { id: 'home-delivery', cond: c => c.location === 'home', app: 'walmart://delivery', web: 'https://walmart.com/delivery' },
+        ]
+      },
+      'mcdonalds-global': {
+        brand_name: "McDonald's", verified: true, emoji: '🍔',
+        phash: null,
+        targets: { app_scheme: 'mcdonalds://menu', web_url: 'https://mcdonalds.com', fallback_url: 'https://mcdonalds.com/app' },
+        rules: [
+          { id: 'breakfast', cond: c => c.hour >= 6 && c.hour < 11, app: 'mcdonalds://breakfast', web: 'https://mcdonalds.com/breakfast' },
+          { id: 'lunch', cond: c => c.hour >= 11 && c.hour < 16, app: 'mcdonalds://lunch-menu', web: 'https://mcdonalds.com/lunch' },
+          { id: 'dinner', cond: c => c.hour >= 18 && c.hour < 23, app: 'mcdonalds://dinner', web: 'https://mcdonalds.com/dinner' },
+          { id: 'english', cond: c => c.lang === 'en', app: 'mcdonalds://en', web: 'https://mcdonalds.com/en' },
+        ]
+      },
+      'netflix-global': {
+        brand_name: 'Netflix', verified: true, emoji: '🎬',
+        phash: null,
+        targets: { app_scheme: 'netflix://home', web_url: 'https://netflix.com', fallback_url: 'https://netflix.com/signup' },
+        rules: [
+          { id: 'vpn-block', cond: c => c.vpn, app: null, web: 'https://netflix.com/vpn-warning' },
+          { id: 'evening', cond: c => c.hour >= 20, app: 'netflix://new', web: 'https://netflix.com/latest' },
+          { id: 'english', cond: c => c.lang === 'en', app: 'netflix://en', web: 'https://netflix.com/en' },
+        ]
+      }
+    };
+
+    // Generate synthetic hashes for presets (deterministic from brand name)
+    function seedHash(str) {
+      let h = 0n;
+      for (let i = 0; i < str.length; i++) {
+        h = (h * 31n + BigInt(str.charCodeAt(i))) & 0xFFFFFFFFFFFFFFFFn;
+      }
+      return h.toString(16).padStart(16, '0');
+    }
+    REGISTRY['walmart-global'].phash = seedHash('walmart-brand-2024');
+    REGISTRY['mcdonalds-global'].phash = seedHash('mcdonalds-brand-2024');
+    REGISTRY['netflix-global'].phash = seedHash('netflix-brand-2024');
+
+    // ─── State ─────────────────────────────────────────────────────────────────
+
+    const ctx = { hour: 14, location: 'store', lang: 'tr', app: false, vpn: false };
+    let currentPhash = null;
+    let currentBrand = null;
+    let resultUrl = '';
+
+    // ─── Helpers ───────────────────────────────────────────────────────────────
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function now() { return new Date().toTimeString().slice(0, 8); }
+
+    function setCtx(key, val) {
+      ctx[key] = val;
+      const maps = {
+        location: ['chip-store', 'chip-home'],
+        lang: ['chip-tr', 'chip-en'],
+        app: ['chip-app-no', 'chip-app-yes'],
+        vpn: ['chip-vpn-no', 'chip-vpn-yes'],
+      };
+      const vals = {
+        location: ['store', 'home'],
+        lang: ['tr', 'en'],
+        app: [false, true],
+        vpn: [false, true],
+      };
+      maps[key].forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.classList.toggle('on', vals[key][i] === val);
+        if (key === 'vpn' && id === 'chip-vpn-yes') {
+          el.classList.toggle('warn-on', val === true);
+        }
+      });
+    }
+
+    // ─── Upload ────────────────────────────────────────────────────────────────
+
+    document.getElementById('file-input').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.getElementById('hash-canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ct = canvas.getContext('2d');
+          ct.drawImage(img, 0, 0);
+          const data = ct.getImageData(0, 0, canvas.width, canvas.height);
+          currentPhash = Hasher.compute(data.data, canvas.width, canvas.height);
+          currentBrand = null;
+
+          document.getElementById('preview-img').src = ev.target.result;
+          document.getElementById('hash-display').textContent = 'pHash: ' + currentPhash;
+          document.getElementById('upload-prompt').style.display = 'none';
+          document.getElementById('logo-preview').style.display = 'flex';
+
+          clearPresets();
+          updateHashCompare();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Drag & drop
+    const zone = document.getElementById('upload-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag');
+      const f = e.dataTransfer.files[0];
+      if (f) { document.getElementById('file-input').files = e.dataTransfer.files; document.getElementById('file-input').dispatchEvent(new Event('change')); }
+    });
+
+    function resetUpload() {
+      document.getElementById('upload-prompt').style.display = '';
+      document.getElementById('logo-preview').style.display = 'none';
+      document.getElementById('file-input').value = '';
+      currentPhash = null;
+    }
+
+    // ─── Presets ───────────────────────────────────────────────────────────────
+
+    function clearPresets() {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    }
+
+    function selectPreset(id) {
+      clearPresets();
+      resetUpload();
+      document.getElementById('preset-' + id).classList.add('active');
+
+      if (id === 'unknown') {
+        currentPhash = 'deadbeefcafe1234';
+        currentBrand = null;
+      } else {
+        currentBrand = id + '-global';
+        currentPhash = REGISTRY[currentBrand].phash;
+      }
+      updateHashCompare();
+    }
+
+    // ─── Hash compare panel ────────────────────────────────────────────────────
+
+    function updateHashCompare() {
+      if (!currentPhash) return;
+      const panel = document.getElementById('compare-panel');
+      const grid = document.getElementById('hash-grid');
+      panel.style.display = 'block';
+
+      const rows = Object.entries(REGISTRY).map(([id, brand]) => {
+        const dist = Hasher.hamming(currentPhash, brand.phash);
+        const isMatch = dist <= 10;
+        const isClose = dist <= 20;
+        const cls = isMatch ? 'match' : isClose ? 'close' : '';
+        return `
+      <div class="hash-row">
+        <span class="hash-brand">${brand.brand_name}</span>
+        <span class="hash-val ${cls}">${brand.phash}</span>
+        <span class="hash-dist ${cls}">d=${dist}</span>
+      </div>`;
+      }).join('');
+
+      grid.innerHTML = `
+    <div class="hash-row" style="margin-bottom:4px;">
+      <span class="hash-brand" style="color:var(--accent2)">Scanned</span>
+      <span class="hash-val" style="color:var(--accent2);border:1px solid rgba(56,217,192,0.3)">${currentPhash}</span>
+      <span class="hash-dist"></span>
+    </div>
+    <div style="height:1px;background:var(--line);grid-column:1/-1;margin:4px 0;"></div>
+    ${rows}
+  `;
+    }
+
+    // ─── Scan ──────────────────────────────────────────────────────────────────
+
+    function runScan() {
+      if (!currentPhash) {
+        alert('Please select or upload a logo first');
+        return;
+      }
+
+      const btn = document.getElementById('scan-btn');
+      const label = document.getElementById('scan-label');
+      btn.disabled = true;
+      label.innerHTML = '<span class="spinning">◎</span> SCANNING...';
+
+      document.getElementById('log-empty').style.display = 'none';
+      document.getElementById('log-lines').style.display = 'flex';
+      document.getElementById('log-lines').innerHTML = '';
+      document.getElementById('result-card-wrap').innerHTML = '';
+      resultUrl = '';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        label.innerHTML = '◉ SCAN';
+        processResult();
+      }, 1600);
+    }
+
+    function processResult() {
+      const ts = now();
+
+      // Find match in registry
+      let matchedBrand = null;
+      let matchDist = Infinity;
+
+      for (const [id, brand] of Object.entries(REGISTRY)) {
+        const d = Hasher.hamming(currentPhash, brand.phash);
+        if (d <= 10 && d < matchDist) {
+          matchDist = d;
+          matchedBrand = { id, ...brand };
+        }
+      }
+
+      const lines = [];
+
+      lines.push({ tag: 'info', msg: `pHash computed: <span class="hi">${currentPhash}</span>`, delay: 0 });
+      lines.push({ tag: 'check', msg: `Querying LDR registry... ${Object.keys(REGISTRY).length} registered brands`, delay: 250 });
+
+      if (!matchedBrand) {
+        lines.push({ tag: 'warn', msg: `<span class="warn">No match found</span> — unregistered logo`, delay: 500 });
+        lines.push({ tag: 'err', msg: `Cryptographic signature <span class="warn">could not be verified</span>`, delay: 750 });
+        pushLines(lines);
+        setTimeout(() => pushResult({ type: 'err', icon: '🚨', url: 'ACCESS DENIED', reason: 'Logo not found in LDR registry. Possible phishing risk.' }), 1000);
+        return;
+      }
+
+      lines.push({ tag: 'ok', msg: `Match: <span class="ok">${matchedBrand.brand_name}</span> <span class="dim">(Hamming d=${matchDist})</span>`, delay: 500 });
+      lines.push({ tag: 'ok', msg: `Cryptographic signature <span class="ok">verified ✓</span>`, delay: 700 });
+
+      if (ctx.vpn) {
+        lines.push({ tag: 'warn', msg: `<span class="warn">VPN detected</span> — location score reduced`, delay: 900 });
+      }
+
+      const baseDelay = ctx.vpn ? 1100 : 900;
+      lines.push({
+        tag: 'check',
+        msg: `Context: time=<span class="hi">${pad(ctx.hour)}:00</span> location=<span class="hi">${ctx.location === 'store' ? 'in-store' : 'home'}</span> language=<span class="hi">${ctx.lang.toUpperCase()}</span> app=<span class="hi">${ctx.app ? 'installed' : 'none'}</span>`,
+        delay: baseDelay
+      });
+
+      // Evaluate rules
+      let matchedRule = null;
+      for (const rule of matchedBrand.rules) {
+        if (rule.cond(ctx)) { matchedRule = rule; break; }
+      }
+
+      const ruleDelay = baseDelay + 250;
+
+      if (matchedRule) {
+        lines.push({ tag: 'route', msg: `Rule matched: <span class="hi">${matchedRule.id}</span>`, delay: ruleDelay });
+      } else {
+        lines.push({ tag: 'route', msg: `No rule matched — <span class="dim">default target</span>`, delay: ruleDelay });
+      }
+
+      const finalUrl = matchedRule
+        ? (ctx.app && matchedRule.app ? matchedRule.app : matchedRule.web)
+        : (ctx.app && matchedBrand.targets.app_scheme ? matchedBrand.targets.app_scheme : matchedBrand.targets.web_url);
+
+      const viaApp = ctx.app && finalUrl === (matchedRule?.app || matchedBrand.targets.app_scheme);
+
+      lines.push({
+        tag: 'ok',
+        msg: `Redirect: <span class="ok">${finalUrl}</span> <span class="dim">${viaApp ? '→ app' : '→ web'}</span>`,
+        delay: ruleDelay + 200
+      });
+
+      resultUrl = finalUrl;
+
+      pushLines(lines);
+      setTimeout(() => {
+        pushResult({
+          type: 'ok',
+          icon: matchedBrand.emoji,
+          url: finalUrl,
+          reason: (matchedRule ? `Rule: ${matchedRule.id}` : 'Default target') + (viaApp ? ' · via app' : ' · via web')
+        });
+        document.getElementById('log-brand').textContent = matchedBrand.brand_name;
+        document.getElementById('log-time').textContent = ts;
+      }, ruleDelay + 400);
+    }
+
+    // ─── Log helpers ───────────────────────────────────────────────────────────
+
+    function pushLines(lines) {
+      const container = document.getElementById('log-lines');
+      lines.forEach(({ tag, msg, delay }) => {
+        setTimeout(() => {
+          const div = document.createElement('div');
+          div.className = 'log-line';
+          div.innerHTML = `
+        <span class="log-ts">${now()}</span>
+        <span class="log-tag tag-${tag}">${tag}</span>
+        <span class="log-msg">${msg}</span>
+      `;
+          container.appendChild(div);
+          requestAnimationFrame(() => div.classList.add('show'));
+          container.parentElement.scrollTop = container.parentElement.scrollHeight;
+        }, delay);
+      });
+    }
+
+    function pushResult({ type, icon, url, reason }) {
+      const wrap = document.getElementById('result-card-wrap');
+      const urlClass = type === 'ok' ? 'ok' : type === 'warn' ? 'warn' : 'err';
+      wrap.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-icon">${icon}</div>
+      <div class="result-meta">
+        <div class="result-label">Redirect Target</div>
+        <div class="result-url ${urlClass}">${url}</div>
+        <div class="result-reason">${reason}</div>
+      </div>
+      ${type === 'ok' ? `<button class="open-btn" onclick="window.open('${url}','_blank')">OPEN →</button>` : ''}
+    </div>`;
+    }
+  </script>
+</body>
+
+</html>

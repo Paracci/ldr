@@ -1,0 +1,214 @@
+[
+  {
+    "brand_id": "walmart-global",
+    "brand_name": "Walmart",
+    "phash": "e3c3c3e3e3c3c3e3",
+    "ahash": "fffefefefefefefe",
+    "dhash": "7f3f1f0f07030100",
+    "verified": true,
+    "signature": "SEED_RSA_PLACEHOLDER",
+    "targets": {
+      "app_scheme": "walmart://home",
+      "web_url": "https://walmart.com",
+      "fallback_url": "https://walmart.com/app-install"
+    },
+    "rules": [
+      {
+        "id": "in-store-morning",
+        "conditions": {
+          "location_type": "in_store",
+          "hour_range": [
+            6,
+            12
+          ]
+        },
+        "targets": {
+          "app_scheme": "walmart://deals/morning",
+          "web_url": "https://walmart.com/deals/morning"
+        }
+      },
+      {
+        "id": "in-store-afternoon",
+        "conditions": {
+          "location_type": "in_store",
+          "hour_range": [
+            12,
+            18
+          ]
+        },
+        "targets": {
+          "app_scheme": "walmart://deals/current",
+          "web_url": "https://walmart.com/deals/current"
+        }
+      },
+      {
+        "id": "in-store-evening",
+        "conditions": {
+          "location_type": "in_store",
+          "hour_range": [
+            18,
+            24
+          ]
+        },
+        "targets": {
+          "app_scheme": "walmart://deals/evening",
+          "web_url": "https://walmart.com/deals/evening"
+        }
+      },
+      {
+        "id": "home-delivery",
+        "conditions": {
+          "location_type": "not_in_store"
+        },
+        "targets": {
+          "app_scheme": "walmart://delivery",
+          "web_url": "https://walmart.com/delivery"
+        }
+      }
+    ],
+    "_note": "phash is a demo placeholder. Real registration requires computing pHash from actual logo image using src/core/hasher.js"
+  },
+  {
+    "brand_id": "mcdonalds-global",
+    "brand_name": "McDonald's",
+    "phash": "183c7effff7e3c18",
+    "ahash": "00183c7e7e3c1800",
+    "dhash": "010307060e1c3870",
+    "verified": true,
+    "signature": "SEED_RSA_PLACEHOLDER",
+    "targets": {
+      "app_scheme": "mcdonalds://menu",
+      "web_url": "https://mcdonalds.com",
+      "fallback_url": "https://mcdonalds.com/app"
+    },
+    "rules": [
+      {
+        "id": "breakfast",
+        "conditions": {
+          "hour_range": [
+            6,
+            11
+          ]
+        },
+        "targets": {
+          "app_scheme": "mcdonalds://breakfast",
+          "web_url": "https://mcdonalds.com/breakfast"
+        }
+      },
+      {
+        "id": "lunch",
+        "conditions": {
+          "hour_range": [
+            11,
+            16
+          ]
+        },
+        "targets": {
+          "app_scheme": "mcdonalds://lunch-menu",
+          "web_url": "https://mcdonalds.com/lunch-menu"
+        }
+      },
+      {
+        "id": "dinner",
+        "conditions": {
+          "hour_range": [
+            18,
+            23
+          ]
+        },
+        "targets": {
+          "app_scheme": "mcdonalds://dinner-menu",
+          "web_url": "https://mcdonalds.com/dinner-menu"
+        }
+      },
+      {
+        "id": "english-ui",
+        "conditions": {
+          "language": "en"
+        },
+        "targets": {
+          "app_scheme": "mcdonalds://en/menu",
+          "web_url": "https://mcdonalds.com/en"
+        }
+      }
+    ],
+    "_note": "phash is a demo placeholder. Real registration requires computing pHash from actual logo image using src/core/hasher.js"
+  },
+  {
+    "brand_id": "netflix-global",
+    "brand_name": "Netflix",
+    "phash": "ff818181818181ff",
+    "ahash": "ff818181818181ff",
+    "dhash": "0103070f1f3f7fff",
+    "verified": true,
+    "signature": "SEED_RSA_PLACEHOLDER",
+    "targets": {
+      "app_scheme": "netflix://home",
+      "web_url": "https://netflix.com",
+      "fallback_url": "https://netflix.com/signup"
+    },
+    "rules": [
+      {
+        "id": "evening-new",
+        "conditions": {
+          "hour_range": [
+            20,
+            24
+          ]
+        },
+        "targets": {
+          "app_scheme": "netflix://new-releases",
+          "web_url": "https://netflix.com/latest"
+        }
+      },
+      {
+        "id": "english-ui",
+        "conditions": {
+          "language": "en"
+        },
+        "targets": {
+          "app_scheme": "netflix://en/browse",
+          "web_url": "https://netflix.com/en"
+        }
+      }
+    ],
+    "_note": "phash is a demo placeholder. Real registration requires computing pHash from actual logo image using src/core/hasher.js"
+  },
+  {
+    "brand_id": "ikea-global",
+    "brand_name": "IKEA",
+    "phash": "c3c3c3ffc3c3c3c3",
+    "ahash": "c3c3c3ffc3c3c3c3",
+    "dhash": "0000007f00000000",
+    "verified": true,
+    "signature": "SEED_RSA_PLACEHOLDER",
+    "targets": {
+      "app_scheme": "ikea://home",
+      "web_url": "https://ikea.com",
+      "fallback_url": "https://ikea.com/app"
+    },
+    "rules": [
+      {
+        "id": "in-store-scan",
+        "conditions": {
+          "location_type": "in_store"
+        },
+        "targets": {
+          "app_scheme": "ikea://store",
+          "web_url": "https://ikea.com/store"
+        }
+      },
+      {
+        "id": "home-order",
+        "conditions": {
+          "location_type": "not_in_store"
+        },
+        "targets": {
+          "app_scheme": "ikea://order",
+          "web_url": "https://ikea.com/order"
+        }
+      }
+    ],
+    "_note": "phash is a demo placeholder. Real registration requires computing pHash from actual logo image using src/core/hasher.js"
+  }
+]

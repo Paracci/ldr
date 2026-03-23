@@ -1,0 +1,95 @@
+# LDR GitHub Labels
+# Apply with: gh label create or a labels sync tool
+
+labels:
+  # Type
+  - name: bug
+    color: "d73a4a"
+    description: Something is broken
+
+  - name: enhancement
+    color: "a2eeef"
+    description: New feature or improvement
+
+  - name: documentation
+    color: "0075ca"
+    description: Documentation changes
+
+  - name: security
+    color: "e4e669"
+    description: Security related
+
+  - name: rfc
+    color: "7057ff"
+    description: Standard change proposal
+
+  - name: use-case
+    color: "008672"
+    description: New sector scenario
+
+  - name: brand-registration
+    color: "e99695"
+    description: Brand logo registration request
+
+  # Status
+  - name: good first issue
+    color: "7057ff"
+    description: Good for newcomers
+
+  - name: help wanted
+    color: "008672"
+    description: Extra attention needed
+
+  - name: in progress
+    color: "fbca04"
+    description: Actively being worked on
+
+  - name: stale
+    color: "cfd3d7"
+    description: Inactive for 60+ days
+
+  - name: pinned
+    color: "0052cc"
+    description: Keep open indefinitely
+
+  - name: wont-fix
+    color: "ffffff"
+    description: Will not be addressed
+
+  # Component
+  - name: core/recognition
+    color: "bfd4f2"
+    description: Visual recognition engine
+
+  - name: core/registry
+    color: "bfd4f2"
+    description: Registry system
+
+  - name: core/rules
+    color: "bfd4f2"
+    description: Rule engine
+
+  - name: sdk/ios
+    color: "d4c5f9"
+    description: iOS SDK
+
+  - name: sdk/android
+    color: "d4c5f9"
+    description: Android SDK
+
+  - name: sdk/web
+    color: "d4c5f9"
+    description: Web SDK
+
+  # Priority
+  - name: priority/critical
+    color: "b60205"
+    description: Must fix immediately
+
+  - name: priority/high
+    color: "e4e669"
+    description: Important
+
+  - name: priority/low
+    color: "cfd3d7"
+    description: Nice to have

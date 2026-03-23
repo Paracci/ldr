@@ -1,0 +1,31 @@
+{
+  "name": "ldr-standard",
+  "version": "0.1.0",
+  "description": "Logo Dynamic Redirect — Open standard for intelligent logo-based routing",
+  "main": "src/core/hasher.js",
+  "scripts": {
+    "test": "node tests/core.test.js && node tests/registry.test.js && node tests/sdk.test.js",
+    "test:core": "node tests/core.test.js",
+    "test:registry": "node tests/registry.test.js",
+    "test:sdk": "node tests/sdk.test.js",
+    "server": "node src/registry/server.js",
+    "server:dev": "PORT=3001 node src/registry/server.js"
+  },
+  "keywords": [
+    "ldr",
+    "logo-recognition",
+    "perceptual-hash",
+    "open-standard",
+    "qr-alternative",
+    "dynamic-redirect"
+  ],
+  "author": "LDR Standard Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paracci/ldr"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
