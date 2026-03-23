@@ -71,7 +71,7 @@ Everything is MIT licensed. The goal is for this to become a community-owned
 open standard, not a product.
 
 GitHub: https://github.com/paracci/ldr
-Demo: [link]
+Demo: https://paracci.github.io/ldr
 
 Curious whether anyone sees fundamental flaws in the approach, and whether
 the chicken-and-egg problem is solvable without a massive first mover.
